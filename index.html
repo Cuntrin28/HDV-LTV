@@ -1,22 +1,61 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hướng dẫn viên ảo Thái Nguyên</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dạ Hướng Dẫn Viên Ảo Thái Nguyên</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    #chatbox { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    .message { padding: 10px; margin: 5px 0; border-radius: 5px; }
-    .user { background: #e0f7fa; text-align: right; }
-    .bot { background: #fff3e0; text-align: left; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    #chatbox {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .message {
+      padding: 10px 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+    .user {
+      background: #d0f0ff;
+      text-align: right;
+      margin-left: auto;
+    }
+    .bot {
+      background: #e5ffd4;
+      text-align: left;
+      margin-right: auto;
+    }
+    #userInput {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="chatbox">
-    <h2>Hướng dẫn viên ảo Thái Nguyên</h2>
+    <h2> Hướng Dẫn Viên Ảo Thái Nguyên</h2>
     <div id="messages"></div>
-    <input type="text" id="userInput" placeholder="Nhập câu hỏi..." style="width: 80%;" />
+    <input type="text" id="userInput" placeholder="Nhập câu hỏi..." />
     <button onclick="sendMessage()">Gửi</button>
   </div>
 
@@ -26,26 +65,30 @@
       const text = input.value.trim();
       if (!text) return;
 
-      // Hiển thị câu hỏi của người dùng
-      const messagesDiv = document.getElementById("messages");
-      messagesDiv.innerHTML += `<div class="message user">${text}</div>`;
+      // Hiển thị tin nhắn người dùng
+      const messages = document.getElementById("messages");
+      messages.innerHTML += `<div class="message user">${text}</div>`;
       input.value = "";
 
-      // Gửi đến webhook n8n
-      const response = await fetch("https://cuongtrinh28.app.n8n.cloud/webhook/b085e3ec-fa38-43fa-896a-eaa0edec4afc", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: text })
-      });
+      try {
+        const res = await fetch("https://cuongtrinh28.app.n8n.cloud/webhook-test/b085e3ec-fa38-43fa-896a-eaa0edec4afc", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: text }) // <-- dữ liệu gửi đi
+        });
 
-      const data = await response.json();
-      const reply = data?.response || "Không nhận được phản hồi từ Hướng dẫn viên ảo.";
+        const data = await res.json();
+        const reply = data.message || data.response || "Xin lỗi, Hướng dẫn viên ảo chưa có phản hồi.";
 
-      // Hiển thị phản hồi từ bot
-      messagesDiv.innerHTML += `<div class="message bot">${reply}</div>`;
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        messages.innerHTML += `<div class="message bot">${reply}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+
+      } catch (err) {
+        messages.innerHTML += `<div class="message bot">Xin lỗi, Hướng dẫn viên ảo chưa có phản hồi.</div>`;
+        console.error(err);
+      }
     }
   </script>
 </body>
