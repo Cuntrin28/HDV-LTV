@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot HDV Ảo</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+    .message { margin: 5px 0; }
+    .user { color: rgb(56, 56, 221); }
+    .bot { color: rgb(255, 238, 0); }
+  </style>
+</head>
+<body>
+
+<h2>AI Hướng Dẫn Viên Ảo Thái Nguyên</h2>
+<div id="chat-box"></div>
+
+<input type="text" id="user-input" placeholder="Nhập tin nhắn..." style="width: 80%;">
+<button onclick="sendMessage()">Gửi</button>
+
+<script>
+  async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+    const message = input.value;
+
+    if (!message.trim()) return;
+
+    chatBox.innerHTML += `<div class="message user"><strong>Bạn:</strong> ${message}</div>`;
+    input.value = '';
+
+    try {
+      const res = await fetch("https://n8n.yourdomain.com/webhook/fa6dccb8-e285-446b-9871-56e719f1ad9d", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      const reply = data.text || data.reply || "Xin lỗi, hướng dẫn viên ảo chưa có phản hồi.";
+      chatBox.innerHTML += `<div class="message bot"><strong>HDV Ảo:</strong> ${reply}</div>`;
+    } catch (error) {
+      chatBox.innerHTML += `<div class="message bot"><strong>Lỗi:</strong> Không thể kết nối tới server.</div>`;
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
